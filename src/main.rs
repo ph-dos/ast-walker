@@ -1,25 +1,12 @@
-use logos::Logos;
+mod lox;
 
+use lox::tokens;
 use std::{
     env,
     fs::File,
     io::{self, Read, Write},
     process::exit,
 };
-
-#[derive(Logos, Debug, PartialEq)]
-enum Token {
-    // #[token(";")]
-    // Semicolon,
-    #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*")]
-    Identifier,
-
-    #[regex(r#""([^"\\]|\\.)*""#)]
-    StringLiteral,
-
-    #[regex(r"[ \t\n\f]+", logos::skip)]
-    Whitespace,
-}
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -36,28 +23,31 @@ fn main() {
 
 fn run_file(filepath: &str) {
     let mut file = File::open(filepath).unwrap();
-    let mut buf = String::new();
-    file.read_to_string(&mut buf).unwrap();
-    run(&buf);
+    let mut buf = vec![];
+    file.read_to_end(&mut buf);
+    run(buf);
 }
 
 fn run_prompt() {
-    let mut buf = String::new();
+    let mut buf = vec![];
     loop {
         print!("> ");
         io::stdout().flush().unwrap();
-        let bytes = io::stdin().read_line(&mut buf).unwrap();
+        let bytes = io::stdin().read_to_end(&mut buf).unwrap(); // brittle
         if bytes == 0 {
             break;
         }
-        run(&buf);
+        run(buf.clone()); // REPL code is small
         buf.clear();
     }
 }
 
-fn run(source: &str) {
-    let mut lexer = Token::lexer(source);
-    while let Some(_token) = lexer.next() {
-        println!("{}", lexer.slice());
-    }
+fn run(source: Vec<u8>) {}
+
+fn report(line: i32, location: String, message: String) {
+    eprintln!("[line {line}] Error {location}: {message}");
+}
+
+pub fn error(line: i32, message: String) {
+    report(line, "".into(), message);
 }
