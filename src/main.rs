@@ -23,17 +23,17 @@ fn main() {
 
 fn run_file(filepath: &str) {
     let mut file = File::open(filepath).unwrap();
-    let mut buf = vec![];
-    file.read_to_end(&mut buf);
+    let mut buf = String::new();
+    file.read_to_string(&mut buf);
     run(buf);
 }
 
 fn run_prompt() {
-    let mut buf = vec![];
+    let mut buf = String::new();
     loop {
         print!("> ");
         io::stdout().flush().unwrap();
-        let bytes = io::stdin().read_to_end(&mut buf).unwrap(); // brittle
+        let bytes = io::stdin().read_to_string(&mut buf).unwrap(); // brittle
         if bytes == 0 {
             break;
         }
@@ -42,7 +42,7 @@ fn run_prompt() {
     }
 }
 
-fn run(source: Vec<u8>) {}
+fn run(source: String) {}
 
 fn report(line: i32, location: String, message: String) {
     eprintln!("[line {line}] Error {location}: {message}");
