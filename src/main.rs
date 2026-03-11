@@ -1,5 +1,6 @@
 mod lox;
 
+use lox::scanner::Scanner;
 use lox::tokens;
 use std::{
     env,
@@ -42,7 +43,11 @@ fn run_prompt() {
     }
 }
 
-fn run(source: String) {}
+fn run(source: String) {
+    let mut lexer = Scanner::new(source);
+    lexer.scan_tokens();
+    println!("{:?}", lexer.get_tokens())
+}
 
 fn report(line: i32, location: String, message: String) {
     eprintln!("[line {line}] Error {location}: {message}");

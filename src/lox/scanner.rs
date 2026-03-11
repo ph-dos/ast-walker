@@ -1,7 +1,7 @@
 use super::tokens as toe;
 use super::tokens::TokenType;
 
-struct Scanner {
+pub struct Scanner {
     source: String,
     tokens: Vec<toe::Token>,
 }
@@ -14,14 +14,18 @@ impl Scanner {
         }
     }
 
-    fn scan_toe(&mut self) {
+    pub fn scan_tokens(&mut self) {
         let mut start = 0;
         let mut current = 0;
         let mut line = 1;
         while current < self.source.len() {
             start = current;
-            current = self.scan_token(start, current, line);
+            current += self.scan_token(start, current, line);
         }
+    }
+
+    pub fn get_tokens(&self) -> &Vec<toe::Token> {
+        &self.tokens
     }
 
     fn scan_token(&mut self, start: usize, current: usize, line: i32) -> usize {
@@ -82,6 +86,7 @@ impl Scanner {
             add_token(&mut self.tokens, token_type, c.to_string(), line);
         } else {
             crate::error(line, "Unexpected symbol.".into()); // no way to track which erros occured
+            return 1;
         }
 
         c.len()
